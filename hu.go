@@ -4,63 +4,28 @@ import "fmt"
 import "bytes"
 import "strings"
 
-type signature struct {
-	label string
-	in signatures
-	out signatures
+type PartOfSpeech struct {
+	name string
+	in []PartOfSpeech
+	out []PartOfSpeech
 }
 
-type signatures []*signature
-
-type definition struct {
-	partOfSpeech *signature
-	terms []*term
+type Definition struct {
+	term string // headword?
+	PartOfSpeech
+//	[]*term
 }
 
-type term struct {
-	label string
-	definitions []*definition
-}
+type Lexicon []Definition
 
-func (s *signature) String() string {
-	return fmt.Sprintf("(%s)", s.label)
-}
+func (p PartOfSpeech) String() string { return  p.name }
 
-func (s signatures) String() string {
+func (d Definition) String() string { return fmt.Sprintf("%s (%s).", d.term, d.PartOfSpeech.name) }
+
+func (l Lexicon) String() string {
 	var b bytes.Buffer
-	for i, s := range s {
-		if i == 0 {
-			fmt.Fprintf(&b, "%s", s.label)
-		} else {
-			fmt.Fprintf(&b, " %s", s.label)
-		}
+	for _, d := range l {
+		fmt.Fprintf(&b, "%s", strings.Title(d.term))
 	}
 	return string(b.Bytes())
-}
-
-func (d *definition) String() string {
-	var b bytes.Buffer
-	fmt.Fprintf(&b, "%s: ", d.partOfSpeech)
-	for i, t := range d.terms {
-		if i == 0 {
-			fmt.Fprintf(&b, "%s", strings.Title(t.label))
-		} else if i == len(d.terms) - 1 {
-			fmt.Fprintf(&b, " %s.", t.label)
-		} else {
-			fmt.Fprintf(&b, " %s", t.label)
-		}
-	}
-	return string(b.Bytes())
-}
-
-func (s *signature) Outputs() string {
-	return fmt.Sprintf("%s", s.out)
-}
-
-func (s *signature) Inputs() string {
-	return fmt.Sprintf("%s", s.in)
-}
-
-func (t *term) String() string {
-	return t.label
 }
